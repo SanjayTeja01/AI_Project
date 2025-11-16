@@ -1,0 +1,47 @@
+name: campus_gaurd_final
+description: Campus Guard - A comprehensive safety application with SOS alerts, emergency contacts management, and AI-powered chatbot assistant for college campuses.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Firebase
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.15.3
+  cloud_firestore: ^4.13.6
+
+  # Location & Maps
+  geolocator: ^10.1.0
+  url_launcher: ^6.2.2
+  google_maps_flutter: ^2.5.0
+
+  # Speech & TTS
+  speech_to_text: ^7.0.0
+  flutter_tts: ^4.0.2
+  
+  # Permissions
+  permission_handler: ^11.3.0
+
+  # UI
+  cupertino_icons: ^1.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter:
+  uses-material-design: true
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon/Campus Guard Image.png"
+  adaptive_icon_background: "#2196F3"
+
