@@ -14,6 +14,14 @@
 
 ---
 
+## 🎥 App Working Demo
+
+**Watch the demo video to see Campus Guard in action:**
+
+👉 [**Click here to watch the demo video**](https://drive.google.com/file/d/1RsEw6pifrM4uA2P182ylJhNSmcRM7g9R/view?usp=sharing)
+
+---
+
 ## 📌 Overview
 
 **Campus Guard** is an AI-powered safety application designed to help students and staff stay safe on campus. The app provides instant emergency alerts, real-time location sharing, and an intelligent voice assistant named **Chitti** for campus navigation and safety guidance.
@@ -237,19 +245,6 @@ service cloud.firestore {
 3. **Google Maps:** Valid API key required
 4. **Speech Recognition:** Requires Google app on Android
 5. **SMS:** Opens messaging app; user must manually send message
-
----
-
-## 👨‍💻 Developers
-
-**Team Campus Guard**
-
-1. **T. Sanjay Teja** (24BDS083)  
-   GitHub: [@SanjayTeja01](https://github.com/SanjayTeja01)
-2. **G. Dharmik** (24BDS021)
-3. **G. Banu Vardhan Reddy** (24BDS022)
-4. **B. Lokeshwara Reddy** (24BDS011)
-5. **M. Santhosh** (24BDS044)
 
 ---
 
