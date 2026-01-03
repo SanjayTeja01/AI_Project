@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:campus_gaurd_final/l10n/app_localizations.dart';
+import 'package:campus_gaurd_final/app_bar_language_selector.dart';
+import 'package:campus_gaurd_final/language_provider.dart';
 
 class SosScreen extends StatefulWidget {
   final bool isActivation;
@@ -49,10 +52,11 @@ class _SosScreenState extends State<SosScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> _deleteSosEvent(String eventId, bool isActive) async {
+    final l10n = AppLocalizations.of(context)!;
     if (isActive) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Cannot delete an active SOS event. Please stop it first.'),
+        SnackBar(
+          content: Text(l10n.cannotDeleteActiveSos),
           backgroundColor: Colors.red,
         ),
       );
@@ -62,17 +66,17 @@ class _SosScreenState extends State<SosScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete SOS Event'),
-        content: const Text('Are you sure you want to delete this SOS event?'),
+        title: Text(l10n.deleteSosEvent),
+        content: Text(l10n.deleteSosEventConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -83,13 +87,13 @@ class _SosScreenState extends State<SosScreen> {
         await _firestore.collection('sos_events').doc(eventId).delete();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('SOS event deleted')),
+            SnackBar(content: Text(l10n.sosEventDeleted)),
           );
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to delete SOS event')),
+            SnackBar(content: Text(l10n.sosEventDeleteFailed)),
           );
         }
       }
@@ -98,18 +102,23 @@ class _SosScreenState extends State<SosScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final languageProvider = LanguageProvider();
     final user = _auth.currentUser;
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Please log in')),
+      return Scaffold(
+        body: Center(child: Text(l10n.user)),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SOS History'),
+        title: Text(l10n.sosHistory),
         backgroundColor: Colors.red,
         foregroundColor: Colors.white,
+        actions: [
+          AppBarLanguageSelector(languageProvider: languageProvider),
+        ],
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _firestore
@@ -144,7 +153,7 @@ class _SosScreenState extends State<SosScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No SOS history',
+                    l10n.noSosHistory,
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.grey[600],
@@ -181,16 +190,17 @@ class _SosScreenState extends State<SosScreen> {
               Color headingColor;
               IconData headingIcon;
               
+              final l10n = AppLocalizations.of(context)!;
               if (isActive) {
-                eventHeading = 'SOS Active';
+                eventHeading = '${l10n.sos} Active';
                 headingColor = Colors.red[700]!;
                 headingIcon = Icons.warning;
               } else if (event.stoppedAt != null) {
-                eventHeading = 'SOS Alert Ended';
+                eventHeading = l10n.sosAlertEnded;
                 headingColor = Colors.green;
                 headingIcon = Icons.check_circle;
               } else {
-                eventHeading = 'SOS Event';
+                eventHeading = '${l10n.sos} Event';
                 headingColor = Colors.black87;
                 headingIcon = Icons.info;
               }
@@ -283,9 +293,9 @@ class _SosScreenState extends State<SosScreen> {
                           children: [
                             const Icon(Icons.location_on, size: 18, color: Colors.blue),
                             const SizedBox(width: 6),
-                            const Text(
-                              'View Location',
-                              style: TextStyle(color: Colors.blue, fontSize: 14),
+                            Text(
+                              l10n.viewLocation,
+                              style: const TextStyle(color: Colors.blue, fontSize: 14),
                             ),
                             const SizedBox(width: 4),
                             const Icon(Icons.open_in_new, size: 16, color: Colors.blue),

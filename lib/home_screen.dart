@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:campus_gaurd_final/l10n/app_localizations.dart';
 import 'package:campus_gaurd_final/active_sos_screen.dart';
 import 'package:campus_gaurd_final/floating_chatbot.dart';
 import 'package:campus_gaurd_final/app_drawer.dart';
 import 'package:campus_gaurd_final/auth_screen.dart';
+import 'package:campus_gaurd_final/app_bar_language_selector.dart';
+import 'package:campus_gaurd_final/language_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -141,36 +144,39 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     // Check location permission
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Location services are disabled. Please enable them.')),
-        );
-      }
-      return;
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
+      if (!serviceEnabled) {
         if (mounted) {
+          final l10n = AppLocalizations.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Location permission denied')),
+            SnackBar(content: Text(l10n?.locationServicesDisabled ?? 'Location services are disabled. Please enable them.')),
           );
         }
         return;
       }
-    }
 
-    if (permission == LocationPermission.deniedForever) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Location permissions are permanently denied')),
-        );
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          if (mounted) {
+            final l10n = AppLocalizations.of(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l10n?.locationPermissionDenied ?? 'Location permission denied')),
+            );
+          }
+          return;
+        }
       }
-      return;
-    }
+
+      if (permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          final l10n = AppLocalizations.of(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n?.locationPermissionPermanentlyDenied ?? 'Location permissions are permanently denied')),
+          );
+        }
+        return;
+      }
 
     try {
       // Get contacts from Firestore
@@ -182,8 +188,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
       if (contactsSnapshot.docs.isEmpty) {
         if (mounted) {
+          final l10n = AppLocalizations.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('No emergency contacts found. Please add contacts first.')),
+            SnackBar(content: Text(l10n?.noEmergencyContacts ?? 'No emergency contacts found. Please add contacts first.')),
           );
         }
         return;
@@ -314,12 +321,20 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = LanguageProvider();
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Campus Guard'),
+        title: Builder(
+          builder: (context) {
+            final l10n = AppLocalizations.of(context);
+            return Text(l10n?.appTitle ?? 'Campus Guard');
+          },
+        ),
         backgroundColor: Colors.purple,
         foregroundColor: Colors.white,
         actions: [
+          AppBarLanguageSelector(languageProvider: languageProvider),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () async {
@@ -383,12 +398,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ),
                   elevation: 8,
                 ),
-                child: const Text(
-                  'SOS',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: Builder(
+                  builder: (context) {
+                    final l10n = AppLocalizations.of(context);
+                    return Text(
+                      l10n?.sos ?? 'SOS',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    );
+                  },
                 ),
               ),
             ),

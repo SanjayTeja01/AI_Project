@@ -1,0 +1,284 @@
+{
+  "@@locale": "en",
+  "appTitle": "Campus Guard",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "welcomeBack": "Welcome back!",
+  "@welcomeBack": {
+    "description": "Welcome message for returning users"
+  },
+  "createAccount": "Create an account",
+  "@createAccount": {
+    "description": "Sign up message"
+  },
+  "username": "Username",
+  "@username": {
+    "description": "Username field label"
+  },
+  "email": "Email",
+  "@email": {
+    "description": "Email field label"
+  },
+  "password": "Password",
+  "@password": {
+    "description": "Password field label"
+  },
+  "login": "Login",
+  "@login": {
+    "description": "Login button text"
+  },
+  "signUp": "Sign Up",
+  "@signUp": {
+    "description": "Sign up button text"
+  },
+  "dontHaveAccount": "Don't have an account? Sign Up",
+  "@dontHaveAccount": {
+    "description": "Link to sign up page"
+  },
+  "alreadyHaveAccount": "Already have an account? Login",
+  "@alreadyHaveAccount": {
+    "description": "Link to login page"
+  },
+  "pleaseEnterUsername": "Please enter a username",
+  "@pleaseEnterUsername": {
+    "description": "Username validation error"
+  },
+  "pleaseEnterEmail": "Please enter an email",
+  "@pleaseEnterEmail": {
+    "description": "Email validation error"
+  },
+  "pleaseEnterValidEmail": "Please enter a valid email",
+  "@pleaseEnterValidEmail": {
+    "description": "Email format validation error"
+  },
+  "pleaseEnterPassword": "Please enter a password",
+  "@pleaseEnterPassword": {
+    "description": "Password validation error"
+  },
+  "passwordMinLength": "Password must be at least 6 characters",
+  "@passwordMinLength": {
+    "description": "Password length validation error"
+  },
+  "anErrorOccurred": "An error occurred",
+  "@anErrorOccurred": {
+    "description": "Generic error message"
+  },
+  "unexpectedError": "An unexpected error occurred",
+  "@unexpectedError": {
+    "description": "Unexpected error message"
+  },
+  "home": "Home",
+  "@home": {
+    "description": "Home menu item"
+  },
+  "profile": "Profile",
+  "@profile": {
+    "description": "Profile menu item"
+  },
+  "sosHistory": "SOS History",
+  "@sosHistory": {
+    "description": "SOS History menu item"
+  },
+  "emergencyContacts": "Emergency Contacts",
+  "@emergencyContacts": {
+    "description": "Emergency Contacts menu item"
+  },
+  "termsAndConditions": "Terms and Conditions",
+  "@termsAndConditions": {
+    "description": "Terms and Conditions menu item"
+  },
+  "logOut": "Log Out",
+  "@logOut": {
+    "description": "Log out menu item"
+  },
+  "logOutConfirm": "Are you sure you want to log out?",
+  "@logOutConfirm": {
+    "description": "Log out confirmation message"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button"
+  },
+  "user": "User",
+  "@user": {
+    "description": "Default user name"
+  },
+  "sos": "SOS",
+  "@sos": {
+    "description": "SOS button text"
+  },
+  "stopSos": "Stop SOS",
+  "@stopSos": {
+    "description": "Stop SOS button text"
+  },
+  "sosAlertEnded": "SOS Alert Ended",
+  "@sosAlertEnded": {
+    "description": "SOS alert ended status"
+  },
+  "viewLocation": "View Location",
+  "@viewLocation": {
+    "description": "View location button"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button"
+  },
+  "mobileNumber": "Mobile Number",
+  "@mobileNumber": {
+    "description": "Mobile number field"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Save button"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Edit button"
+  },
+  "name": "Name",
+  "@name": {
+    "description": "Name field"
+  },
+  "phone": "Phone",
+  "@phone": {
+    "description": "Phone field"
+  },
+  "addContact": "Add Contact",
+  "@addContact": {
+    "description": "Add contact button"
+  },
+  "noContacts": "No contacts added yet",
+  "@noContacts": {
+    "description": "Empty contacts message"
+  },
+  "acceptTerms": "I accept the Terms and Conditions",
+  "@acceptTerms": {
+    "description": "Terms acceptance checkbox"
+  },
+  "pleaseAcceptTerms": "Please accept the Terms and Conditions",
+  "@pleaseAcceptTerms": {
+    "description": "Terms acceptance error"
+  },
+  "language": "Language",
+  "@language": {
+    "description": "Language selection"
+  },
+  "english": "English",
+  "@english": {
+    "description": "English language"
+  },
+  "telugu": "తెలుగు",
+  "@telugu": {
+    "description": "Telugu language"
+  },
+  "hindi": "हिंदी",
+  "@hindi": {
+    "description": "Hindi language"
+  },
+  "locationServicesDisabled": "Location services are disabled. Please enable them.",
+  "@locationServicesDisabled": {
+    "description": "Location services disabled error"
+  },
+  "locationPermissionDenied": "Location permission denied",
+  "@locationPermissionDenied": {
+    "description": "Location permission denied error"
+  },
+  "locationPermissionPermanentlyDenied": "Location permissions are permanently denied",
+  "@locationPermissionPermanentlyDenied": {
+    "description": "Location permission permanently denied error"
+  },
+  "noEmergencyContacts": "No emergency contacts found. Please add contacts first.",
+  "@noEmergencyContacts": {
+    "description": "No emergency contacts error"
+  },
+  "profileUpdated": "Profile updated successfully",
+  "@profileUpdated": {
+    "description": "Profile update success message"
+  },
+  "profileUpdateFailed": "Failed to update profile",
+  "@profileUpdateFailed": {
+    "description": "Profile update error message"
+  },
+  "fillAllFields": "Please fill in all fields",
+  "@fillAllFields": {
+    "description": "Form validation error"
+  },
+  "contactAdded": "Contact added successfully",
+  "@contactAdded": {
+    "description": "Contact add success message"
+  },
+  "contactAddFailed": "Failed to add contact",
+  "@contactAddFailed": {
+    "description": "Contact add error message"
+  },
+  "deleteContact": "Delete Contact",
+  "@deleteContact": {
+    "description": "Delete contact dialog title"
+  },
+  "deleteContactConfirm": "Are you sure you want to delete this contact?",
+  "@deleteContactConfirm": {
+    "description": "Delete contact confirmation"
+  },
+  "contactDeleted": "Contact deleted",
+  "@contactDeleted": {
+    "description": "Contact deleted message"
+  },
+  "deleteSosEvent": "Delete SOS Event",
+  "@deleteSosEvent": {
+    "description": "Delete SOS event dialog title"
+  },
+  "deleteSosEventConfirm": "Are you sure you want to delete this SOS event?",
+  "@deleteSosEventConfirm": {
+    "description": "Delete SOS event confirmation"
+  },
+  "cannotDeleteActiveSos": "Cannot delete an active SOS event. Please stop it first.",
+  "@cannotDeleteActiveSos": {
+    "description": "Cannot delete active SOS error"
+  },
+  "sosEventDeleted": "SOS event deleted",
+  "@sosEventDeleted": {
+    "description": "SOS event deleted message"
+  },
+  "sosEventDeleteFailed": "Failed to delete SOS event",
+  "@sosEventDeleteFailed": {
+    "description": "SOS event delete error"
+  },
+  "noSosHistory": "No SOS history",
+  "@noSosHistory": {
+    "description": "Empty SOS history message"
+  },
+  "stopSos": "Stop SOS",
+  "@stopSos": {
+    "description": "Stop SOS button"
+  },
+  "stopSosConfirm": "Are you sure you want to stop the SOS alert?",
+  "@stopSosConfirm": {
+    "description": "Stop SOS confirmation"
+  },
+  "chittiVoiceAssistant": "Chitti Voice Assistant",
+  "@chittiVoiceAssistant": {
+    "description": "Chatbot title"
+  },
+  "chatWithChitti": "Chat with Chitti",
+  "@chatWithChitti": {
+    "description": "Chatbot welcome message"
+  },
+  "typeMessageOrVoice": "Type a message or use voice",
+  "@typeMessageOrVoice": {
+    "description": "Chatbot input hint"
+  },
+  "typeYourMessage": "Type your message...",
+  "@typeYourMessage": {
+    "description": "Chatbot text input hint"
+  },
+  "chittiThinking": "Chitti is thinking...",
+  "@chittiThinking": {
+    "description": "Chatbot thinking message"
+  },
+  "newChat": "New Chat",
+  "@newChat": {
+    "description": "New chat session title"
+  }
+}
+

@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:campus_gaurd_final/l10n/app_localizations.dart';
 import 'package:campus_gaurd_final/app_drawer.dart';
 import 'package:campus_gaurd_final/floating_chatbot.dart';
 import 'package:campus_gaurd_final/home_screen.dart';
+import 'package:campus_gaurd_final/app_bar_language_selector.dart';
+import 'package:campus_gaurd_final/language_provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -113,23 +116,24 @@ class _ActiveSosScreenState extends State<ActiveSosScreen> {
   }
 
   Future<void> _stopSOS() async {
+    final l10n = AppLocalizations.of(context)!;
     final user = _auth.currentUser;
     if (user == null) return;
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Stop SOS'),
-        content: const Text('Are you sure you want to stop the SOS alert?'),
+        title: Text(l10n.stopSos),
+        content: Text(l10n.stopSosConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-            child: const Text('Stop SOS', style: TextStyle(color: Colors.white)),
+            child: Text(l10n.stopSos, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -235,12 +239,18 @@ class _ActiveSosScreenState extends State<ActiveSosScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final languageProvider = LanguageProvider();
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Active SOS'),
+        title: Text('${l10n.sos} Active'),
         backgroundColor: Colors.red,
         foregroundColor: Colors.white,
         automaticallyImplyLeading: true, // Show hamburger menu
+        actions: [
+          AppBarLanguageSelector(languageProvider: languageProvider),
+        ],
       ),
       drawer: AppDrawer(),
       floatingActionButton: const FloatingChatbot(),
@@ -298,9 +308,9 @@ class _ActiveSosScreenState extends State<ActiveSosScreen> {
                   ),
                   elevation: 8,
                 ),
-                child: const Text(
-                  'Stop SOS',
-                  style: TextStyle(
+                child: Text(
+                  l10n.stopSos,
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),

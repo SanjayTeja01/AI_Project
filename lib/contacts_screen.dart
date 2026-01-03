@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:campus_gaurd_final/l10n/app_localizations.dart';
+import 'package:campus_gaurd_final/app_bar_language_selector.dart';
+import 'package:campus_gaurd_final/language_provider.dart';
 
 class ContactsScreen extends StatefulWidget {
   const ContactsScreen({super.key});
@@ -24,8 +27,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
     final phone = _phoneController.text.trim();
 
     if (name.isEmpty || phone.isEmpty) {
+      final l10n = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all fields')),
+        SnackBar(content: Text(l10n?.fillAllFields ?? 'Please fill in all fields')),
       );
       return;
     }
@@ -44,15 +48,17 @@ class _ContactsScreenState extends State<ContactsScreen> {
       _nameController.clear();
       _phoneController.clear();
       if (mounted) {
+        final l10n = AppLocalizations.of(context);
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Contact added successfully')),
+          SnackBar(content: Text(l10n?.contactAdded ?? 'Contact added successfully')),
         );
       }
     } catch (e) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to add contact')),
+          SnackBar(content: Text(l10n?.contactAddFailed ?? 'Failed to add contact')),
         );
       }
     }
@@ -62,20 +68,21 @@ class _ContactsScreenState extends State<ContactsScreen> {
     final user = _auth.currentUser;
     if (user == null) return;
 
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Contact'),
-        content: const Text('Are you sure you want to delete this contact?'),
+        title: Text(l10n.deleteContact),
+        content: Text(l10n.deleteContactConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -91,14 +98,16 @@ class _ContactsScreenState extends State<ContactsScreen> {
             .delete();
 
         if (mounted) {
+          final l10n = AppLocalizations.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Contact deleted')),
+            SnackBar(content: Text(l10n?.contactDeleted ?? 'Contact deleted')),
           );
         }
       } catch (e) {
         if (mounted) {
+          final l10n = AppLocalizations.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to delete contact')),
+            SnackBar(content: Text(l10n?.contactAddFailed ?? 'Failed to delete contact')),
           );
         }
       }
@@ -106,26 +115,27 @@ class _ContactsScreenState extends State<ContactsScreen> {
   }
 
   void _showAddContactDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Add Emergency Contact'),
+        title: Text(l10n.addContact),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Name',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.name,
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _phoneController,
-              decoration: const InputDecoration(
-                labelText: 'Phone Number',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.phone,
+                border: const OutlineInputBorder(),
               ),
               keyboardType: TextInputType.phone,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -135,7 +145,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -143,7 +153,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
               _addContact();
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
-            child: const Text('Add', style: TextStyle(color: Colors.white)),
+            child: Text(l10n.addContact, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -159,18 +169,23 @@ class _ContactsScreenState extends State<ContactsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final languageProvider = LanguageProvider();
     final user = _auth.currentUser;
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Please log in')),
+      return Scaffold(
+        body: Center(child: Text(l10n.user)),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Emergency Contacts'),
+        title: Text(l10n.emergencyContacts),
         backgroundColor: Colors.purple,
         foregroundColor: Colors.white,
+        actions: [
+          AppBarLanguageSelector(languageProvider: languageProvider),
+        ],
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _firestore
@@ -204,7 +219,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No emergency contacts',
+                    l10n.noContacts,
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.grey[600],
@@ -212,7 +227,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Add trusted contacts to receive SOS alerts',
+                    l10n.addContact,
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[500],

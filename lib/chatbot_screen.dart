@@ -5,11 +5,14 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:campus_gaurd_final/l10n/app_localizations.dart';
 import 'package:campus_gaurd_final/profile_screen.dart';
 import 'package:campus_gaurd_final/contacts_screen.dart';
 import 'package:campus_gaurd_final/sos_screen.dart';
 import 'package:campus_gaurd_final/active_sos_screen.dart';
 import 'package:campus_gaurd_final/auth_screen.dart';
+import 'package:campus_gaurd_final/language_provider.dart';
+import 'package:campus_gaurd_final/chatbot_translations.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -87,7 +90,9 @@ class ChatSession {
 }
 
 class ChatbotScreen extends StatefulWidget {
-  const ChatbotScreen({super.key});
+  final bool isDialog;
+  
+  const ChatbotScreen({super.key, this.isDialog = false});
 
   @override
   State<ChatbotScreen> createState() => _ChatbotScreenState();
@@ -122,6 +127,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
   bool _hasShownWelcome = false;
   bool _isLoadingHistory = true;
   String? _userId;
+  final LanguageProvider _languageProvider = LanguageProvider();
 
   @override
   void initState() {
@@ -158,6 +164,27 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
         setState(() {});
       }
     });
+    
+    // Listen to language changes
+    _languageProvider.addListener(_onLanguageChanged);
+  }
+  
+  void _onLanguageChanged() {
+    if (mounted) {
+      _initTts();
+      _initSpeech();
+    }
+  }
+  
+  @override
+  void dispose() {
+    _languageProvider.removeListener(_onLanguageChanged);
+    _speechToText.cancel();
+    _flutterTts.stop();
+    _textController.dispose();
+    _scrollController.dispose();
+    _animationController.dispose();
+    super.dispose();
   }
 
   // Load chat sessions list (for initial load)
@@ -225,15 +252,16 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
           .doc(_userId)
           .collection('chat_sessions')
           .add({
-        'title': 'New Chat',
+        'title': AppLocalizations.of(context)?.newChat ?? 'New Chat',
         'createdAt': Timestamp.now(),
         'updatedAt': Timestamp.now(),
         'messageCount': 0,
       });
 
+      final l10n = AppLocalizations.of(context);
       final newSession = ChatSession(
         id: newSessionRef.id,
-        title: 'New Chat',
+        title: l10n?.newChat ?? 'New Chat',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
         messageCount: 0,
@@ -527,9 +555,14 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
                         _createNewSession();
                       },
                       icon: const Icon(Icons.add, size: 20),
-                      label: const Text(
-                        'New Chat',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      label: Builder(
+                        builder: (context) {
+                          final l10n = AppLocalizations.of(context);
+                          return Text(
+                            l10n?.newChat ?? 'New Chat',
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                          );
+                        },
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
@@ -543,13 +576,18 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
                     ),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    'Chat History',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Builder(
+                    builder: (context) {
+                      final l10n = AppLocalizations.of(context);
+                      return Text(
+                        l10n?.sosHistory ?? 'Chat History',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -593,13 +631,19 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
                   return Center(
                     child: Padding(
                       padding: const EdgeInsets.all(24.0),
-                      child: Text(
-                        'No chat history yet.\nTap "New Chat" to start!',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
-                        ),
+                      child: Builder(
+                        builder: (context) {
+                          final l10n = AppLocalizations.of(context);
+                          final newChatText = l10n?.newChat ?? 'New Chat';
+                          return Text(
+                            'No chat history yet.\nTap "$newChatText" to start!',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                            ),
+                          );
+                        },
                       ),
                     ),
                   );
@@ -773,8 +817,27 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
       if (available) {
         final locales = await _speechToText.locales();
         if (locales.isNotEmpty) {
-          var enLocale = locales.firstWhere((l) => l.localeId.startsWith('en_'), orElse: () => locales.first);
-          _currentLocale = enLocale.localeId;
+          // Set locale based on selected language
+          String languageCode = _languageProvider.locale.languageCode;
+          String targetLocale = 'en_US'; // Default
+          
+          if (languageCode == 'hi') {
+            targetLocale = 'hi_IN';
+          } else if (languageCode == 'te') {
+            targetLocale = 'te_IN';
+          } else {
+            targetLocale = 'en_US';
+          }
+          
+          // Try to find the exact locale, fallback to closest match
+          var selectedLocale = locales.firstWhere(
+            (l) => l.localeId == targetLocale || l.localeId.startsWith(languageCode),
+            orElse: () => locales.firstWhere(
+              (l) => l.localeId.startsWith('en_'),
+              orElse: () => locales.first,
+            ),
+          );
+          _currentLocale = selectedLocale.localeId;
         }
       }
       
@@ -793,7 +856,29 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
   }
 
   Future<void> _initTts() async {
-    await _flutterTts.setLanguage("en-US");
+    // Set TTS language based on selected language
+    String languageCode = _languageProvider.locale.languageCode;
+    String ttsLanguage = 'en-US'; // Default
+    
+    if (languageCode == 'hi') {
+      ttsLanguage = 'hi-IN';
+    } else if (languageCode == 'te') {
+      ttsLanguage = 'te-IN';
+    } else {
+      ttsLanguage = 'en-US';
+    }
+    
+    // Get available TTS languages and use the best match
+    List<dynamic> languages = await _flutterTts.getLanguages;
+    String? selectedLanguage = languages.firstWhere(
+      (lang) => lang.toString().toLowerCase().contains(ttsLanguage.toLowerCase()),
+      orElse: () => languages.firstWhere(
+        (lang) => lang.toString().toLowerCase().contains('en'),
+        orElse: () => 'en-US',
+      ),
+    );
+    
+    await _flutterTts.setLanguage(selectedLanguage.toString());
     await _flutterTts.setPitch(1.0);
     await _flutterTts.setSpeechRate(0.5);
 
@@ -964,30 +1049,32 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
 
     if (isKnownCommand) {
       if (isEmergency) {
-        _addBotMessage('Activating SOS immediately...');
+        final response = ChatbotTranslations.getSosActivating();
+        _addBotMessage(response);
         await _triggerAutomaticSOS();
         return; // SOS function handles its own state.
       } else if (isStopSos) {
-        _addBotMessage('Stopping SOS alert...');
+        final response = ChatbotTranslations.getStoppingSos();
+        _addBotMessage(response);
         await _handleStopSOS();
         return; // Stop SOS function handles its own state.
       } else if (command.contains('profile')) {
-        final response = 'Opening your profile.';
+        final response = ChatbotTranslations.getOpeningProfile();
         _addBotMessage(response);
         await _speak(response, showInChat: false);
         if (mounted) await Navigator.of(context).push(MaterialPageRoute(builder: (c) => const ProfileScreen()));
       } else if (command.contains('contacts')) {
-        final response = 'Showing your emergency contacts.';
+        final response = ChatbotTranslations.getOpeningContacts();
         _addBotMessage(response);
         await _speak(response, showInChat: false);
         if (mounted) await Navigator.of(context).push(MaterialPageRoute(builder: (c) => const ContactsScreen()));
       } else if (command.contains('history')) {
-        final response = 'Opening your S.O.S. history.';
+        final response = ChatbotTranslations.getOpeningHistory();
         _addBotMessage(response);
         await _speak(response, showInChat: false);
         if (mounted) await Navigator.of(context).push(MaterialPageRoute(builder: (c) => const SosScreen(isActivation: false)));
       } else if (command.contains('logout') || command.contains('log out')) {
-        final response = 'Logging you out. Goodbye!';
+        final response = ChatbotTranslations.getLoggingOut();
         _addBotMessage(response);
         await _speak(response, showInChat: false);
         await _auth.signOut();
@@ -1011,7 +1098,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
 
 
   Future<void> _triggerAutomaticSOS() async {
-    final message = 'Activating SOS immediately. Searching for contacts.';
+    final message = ChatbotTranslations.getSosActivating();
     _addBotMessage(message);
     await _speak(message, showInChat: false);
 
@@ -1234,8 +1321,9 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
     }
 
     // Show thinking indicator
+    final l10n = AppLocalizations.of(context);
     final thinkingMessage = ChatMessage(
-      text: 'Chitti is thinking...',
+      text: l10n?.chittiThinking ?? 'Chitti is thinking...',
       type: MessageType.bot,
       timestamp: DateTime.now(),
     );
@@ -1269,50 +1357,25 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
     final lowerQuery = query.toLowerCase().trim();
 
     // Greetings and casual conversation
-    if (_matchesPattern(lowerQuery, ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening'])) {
-      final greetings = [
-        'Hello $_username! How can I help you today?',
-        'Hi there! What can I do for you?',
-        'Hey $_username! Ready to assist you.',
-        'Hello! I\'m here to help you stay safe.',
-        'Hi! I\'m Chitti, your safety assistant. How can I help?',
-      ];
-      return _getRandomResponse(greetings);
+    if (_matchesPattern(lowerQuery, ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening', 'namaste', 'namaskar', 'नमस्ते', 'హలో', 'నమస్కారం'])) {
+      return ChatbotTranslations.getGreeting(_username);
     }
 
-    if (_matchesPattern(lowerQuery, ['how are you', 'how do you do', 'what\'s up', 'whats up'])) {
-      final responses = [
-        'I\'m doing great! Always ready to help you stay safe. What can I do for you?',
-        'I\'m fine, thank you! My main job is to keep you safe. Need any help?',
-        'All good here! I\'m always ready when you need me. How can I assist?',
-        'I\'m excellent! Here to help you with safety and emergencies. What do you need?',
-      ];
-      return _getRandomResponse(responses);
+    if (_matchesPattern(lowerQuery, ['how are you', 'how do you do', 'what\'s up', 'whats up', 'कैसे हो', 'ఎలా ఉన్నారు'])) {
+      return ChatbotTranslations.getHowAreYou(_username);
     }
 
-    if (_matchesPattern(lowerQuery, ['thank', 'thanks', 'thank you'])) {
-      final responses = [
-        'You\'re welcome! Always happy to help.',
-        'My pleasure, $_username! Anything else you need?',
-        'Happy to help! Stay safe out there.',
-        'Anytime! Remember, I\'m here whenever you need me.',
-      ];
-      return _getRandomResponse(responses);
+    if (_matchesPattern(lowerQuery, ['thank', 'thanks', 'thank you', 'धन्यवाद', 'ధన్యవాదాలు'])) {
+      return ChatbotTranslations.getThankYou(_username);
     }
 
-    if (_matchesPattern(lowerQuery, ['goodbye', 'bye', 'see you', 'see ya'])) {
-      final responses = [
-        'Goodbye $_username! Stay safe!',
-        'See you later! Take care.',
-        'Bye! Remember, I\'m just a voice command away if you need me.',
-        'Farewell! Stay safe out there.',
-      ];
-      return _getRandomResponse(responses);
+    if (_matchesPattern(lowerQuery, ['goodbye', 'bye', 'see you', 'see ya', 'अलविदा', 'వీడ్కోలు'])) {
+      return ChatbotTranslations.getGoodbye(_username);
     }
 
     // App features and functionality questions
-    if (_matchesPattern(lowerQuery, ['what can you do', 'what do you do', 'help', 'features', 'capabilities'])) {
-      return 'I can help you with many things! I can activate SOS alerts, manage your emergency contacts, show your SOS history, open your profile, and answer safety questions. Just ask me anything, or say SOS, contacts, history, or profile to get started!';
+    if (_matchesPattern(lowerQuery, ['what can you do', 'what do you do', 'help', 'features', 'capabilities', 'क्या कर सकते हो', 'మీరు ఏమి చేయగలరు'])) {
+      return ChatbotTranslations.getWhatCanYouDo();
     }
 
     if (_matchesPattern(lowerQuery, ['how does sos work', 'explain sos', 'what is sos', 'tell me about sos'])) {
@@ -1808,15 +1871,6 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
     await _flutterTts.speak(text);
   }
 
-  @override
-  void dispose() {
-    _speechToText.cancel();
-    _flutterTts.stop();
-    _textController.dispose();
-    _scrollController.dispose();
-    _animationController.dispose();
-    super.dispose();
-  }
 
   // Build animated chatbot avatar (left side)
   Widget _buildChatbotAvatar() {
@@ -1914,7 +1968,9 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
   Widget _buildMessageBubble(ChatMessage message) {
     final isUser = message.type == MessageType.user;
     
-    if (message.text == 'Chitti is thinking...') {
+    final l10n = AppLocalizations.of(context);
+    final thinkingText = l10n?.chittiThinking ?? 'Chitti is thinking...';
+    if (message.text == thinkingText) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         child: Row(
@@ -1928,7 +1984,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
                 color: Colors.grey[200],
                 borderRadius: BorderRadius.circular(18),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SizedBox(
@@ -1941,7 +1997,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
                   ),
                   SizedBox(width: 8),
                   Text(
-                    'Chitti is thinking...',
+                    thinkingText,
                     style: TextStyle(
                       color: Colors.grey,
                       fontSize: 14,
@@ -1997,21 +2053,8 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Chitti Voice Assistant'),
-        backgroundColor: Colors.purple,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
-      ),
-      drawer: _buildChatHistoryDrawer(),
-      body: GestureDetector(
+  Widget _buildChatContent() {
+    return GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: Column(
           children: <Widget>[
@@ -2028,21 +2071,31 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
                             children: [
                               _buildChatbotAvatar(),
                               const SizedBox(height: 16),
-                              Text(
-                                'Chat with Chitti',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.grey[600],
-                                  fontWeight: FontWeight.w500,
-                                ),
+                              Builder(
+                                builder: (context) {
+                                  final l10n = AppLocalizations.of(context);
+                                  return Text(
+                                    l10n?.chatWithChitti ?? 'Chat with Chitti',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.grey[600],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  );
+                                },
                               ),
                               const SizedBox(height: 8),
-                              Text(
-                                'Type a message or use voice',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey[500],
-                                ),
+                              Builder(
+                                builder: (context) {
+                                  final l10n = AppLocalizations.of(context);
+                                  return Text(
+                                    l10n?.typeMessageOrVoice ?? 'Type a message or use voice',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[500],
+                                    ),
+                                  );
+                                },
                               ),
                             ],
                           ),
@@ -2116,7 +2169,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
                         maxLines: null,
                         textInputAction: TextInputAction.send,
                       decoration: InputDecoration(
-                          hintText: 'Type your message...',
+                          hintText: AppLocalizations.of(context)?.typeYourMessage ?? 'Type your message...',
                         filled: true,
                         fillColor: Colors.grey[200],
                         border: OutlineInputBorder(
@@ -2162,7 +2215,33 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
             ),
           ],
         ),
+      );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.isDialog) {
+      return _buildChatContent();
+    }
+    
+    return Scaffold(
+      appBar: AppBar(
+        title: Builder(
+          builder: (context) {
+            final l10n = AppLocalizations.of(context);
+            return Text(l10n?.chittiVoiceAssistant ?? 'Chitti Voice Assistant');
+          },
+        ),
+        backgroundColor: Colors.purple,
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
       ),
+      drawer: _buildChatHistoryDrawer(),
+      body: _buildChatContent(),
     );
   }
 }

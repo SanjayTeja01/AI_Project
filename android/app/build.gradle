@@ -30,7 +30,7 @@ if (googleMapsApiKey == null) {
 
 android {
     namespace "com.sanjay.campus_gaurd"
-    compileSdk 34
+    compileSdk 36
     ndkVersion flutter.ndkVersion
 
     compileOptions {

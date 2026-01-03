@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:campus_gaurd_final/l10n/app_localizations.dart';
+import 'package:campus_gaurd_final/app_bar_language_selector.dart';
+import 'package:campus_gaurd_final/language_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -95,14 +98,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _isEditing = false;
       });
       if (mounted) {
+        final l10n = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully')),
+          SnackBar(content: Text(l10n?.profileUpdated ?? 'Profile updated successfully')),
         );
       }
     } catch (e) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to update profile')),
+          SnackBar(content: Text(l10n?.profileUpdateFailed ?? 'Failed to update profile')),
         );
       }
     }
@@ -110,11 +115,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final languageProvider = LanguageProvider();
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: Text(l10n.profile),
         backgroundColor: Colors.purple,
         foregroundColor: Colors.white,
+        actions: [
+          AppBarLanguageSelector(languageProvider: languageProvider),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: Colors.purple))
@@ -142,9 +153,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
-                                'Username',
-                                style: TextStyle(
+                              Text(
+                                l10n.username,
+                                style: const TextStyle(
                                   fontSize: 14,
                                   color: Colors.grey,
                                 ),
@@ -197,9 +208,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ),
                           const SizedBox(height: 24),
-                          const Text(
-                            'Email',
-                            style: TextStyle(
+                          Text(
+                            l10n.email,
+                            style: const TextStyle(
                               fontSize: 14,
                               color: Colors.grey,
                             ),
@@ -213,9 +224,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                           const SizedBox(height: 24),
-                          const Text(
-                            'Mobile Number',
-                            style: TextStyle(
+                          Text(
+                            l10n.mobileNumber,
+                            style: const TextStyle(
                               fontSize: 14,
                               color: Colors.grey,
                             ),
@@ -225,9 +236,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ? TextField(
                                   controller: _mobileNumberController,
                                   keyboardType: TextInputType.phone,
-                                  decoration: const InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    hintText: 'Enter mobile number',
+                                  decoration: InputDecoration(
+                                    border: const OutlineInputBorder(),
+                                    hintText: l10n.mobileNumber,
                                   ),
                                 )
                               : Text(

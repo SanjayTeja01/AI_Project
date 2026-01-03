@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:campus_gaurd_final/chatbot_screen.dart';
+import 'package:campus_gaurd_final/chatbot_dialog.dart';
 
 class FloatingChatbot extends StatefulWidget {
   const FloatingChatbot({super.key});
@@ -55,9 +55,10 @@ class _FloatingChatbotState extends State<FloatingChatbot> with SingleTickerProv
             angle: _rotationAnimation.value,
             child: FloatingActionButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ChatbotScreen()),
+                showDialog(
+                  context: context,
+                  barrierColor: Colors.black54,
+                  builder: (context) => const ChatbotDialog(),
                 );
               },
               backgroundColor: Colors.transparent,

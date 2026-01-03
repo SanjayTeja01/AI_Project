@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:campus_gaurd_final/l10n/app_localizations.dart';
 import 'package:campus_gaurd_final/home_screen.dart';
 import 'package:campus_gaurd_final/profile_screen.dart';
 import 'package:campus_gaurd_final/contacts_screen.dart';
@@ -14,6 +15,8 @@ class AppDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -26,9 +29,9 @@ class AppDrawer extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                const Text(
-                  'Campus Guard',
-                  style: TextStyle(
+                Text(
+                  l10n.appTitle,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -36,7 +39,7 @@ class AppDrawer extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  auth.currentUser?.email ?? 'User',
+                  auth.currentUser?.email ?? l10n.user,
                   style: const TextStyle(
                     color: Colors.white70,
                     fontSize: 14,
@@ -47,7 +50,7 @@ class AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.home, color: Colors.purple),
-            title: const Text('Home'),
+            title: Text(l10n.home),
             onTap: () {
               Navigator.pop(context);
               // If already on home, do nothing, else navigate
@@ -61,7 +64,7 @@ class AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.person, color: Colors.blue),
-            title: const Text('Profile'),
+            title: Text(l10n.profile),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -72,7 +75,7 @@ class AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.history, color: Colors.orange),
-            title: const Text('SOS History'),
+            title: Text(l10n.sosHistory),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -83,7 +86,7 @@ class AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.contacts, color: Colors.green),
-            title: const Text('Emergency Contacts'),
+            title: Text(l10n.emergencyContacts),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -95,7 +98,7 @@ class AppDrawer extends StatelessWidget {
           const Divider(),
           ListTile(
             leading: const Icon(Icons.description, color: Colors.grey),
-            title: const Text('Terms and Conditions'),
+            title: Text(l10n.termsAndConditions),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -107,23 +110,23 @@ class AppDrawer extends StatelessWidget {
           const Divider(),
           ListTile(
             leading: const Icon(Icons.logout, color: Colors.red),
-            title: const Text('Log Out'),
+            title: Text(l10n.logOut),
             onTap: () async {
               Navigator.pop(context);
               final confirmed = await showDialog<bool>(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: const Text('Log Out'),
-                  content: const Text('Are you sure you want to log out?'),
+                  title: Text(l10n.logOut),
+                  content: Text(l10n.logOutConfirm),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context, false),
-                      child: const Text('Cancel'),
+                      child: Text(l10n.cancel),
                     ),
                     ElevatedButton(
                       onPressed: () => Navigator.pop(context, true),
                       style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                      child: const Text('Log Out', style: TextStyle(color: Colors.white)),
+                      child: Text(l10n.logOut, style: const TextStyle(color: Colors.white)),
                     ),
                   ],
                 ),

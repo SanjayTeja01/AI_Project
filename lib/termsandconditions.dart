@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:campus_gaurd_final/l10n/app_localizations.dart';
+import 'package:campus_gaurd_final/app_bar_language_selector.dart';
+import 'package:campus_gaurd_final/language_provider.dart';
 
 class TermsAndConditionsScreen extends StatefulWidget {
   const TermsAndConditionsScreen({super.key});
@@ -31,13 +34,19 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final languageProvider = LanguageProvider();
+    
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Terms and Conditions'),
+          title: Text(l10n.termsAndConditions),
           backgroundColor: Colors.purple,
           foregroundColor: Colors.white,
+          actions: [
+            AppBarLanguageSelector(languageProvider: languageProvider),
+          ],
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
@@ -260,7 +269,7 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
                     ),
                     Expanded(
                       child: Text(
-                        'I accept the Terms and Conditions',
+                        l10n.acceptTerms,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: _accepted ? FontWeight.normal : FontWeight.w500,
@@ -290,7 +299,7 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'Please accept the Terms and Conditions to continue',
+                            l10n.pleaseAcceptTerms,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 14,

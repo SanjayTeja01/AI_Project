@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:campus_gaurd_final/l10n/app_localizations.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -57,13 +58,15 @@ class _AuthScreenState extends State<AuthScreen> {
         }
       }
     } on FirebaseAuthException catch (e) {
+      final l10n = AppLocalizations.of(context);
       setState(() {
-        _errorMessage = e.message ?? 'An error occurred';
+        _errorMessage = e.message ?? (l10n?.anErrorOccurred ?? 'An error occurred');
         _isLoading = false;
       });
     } catch (e) {
+      final l10n = AppLocalizations.of(context);
       setState(() {
-        _errorMessage = 'An unexpected error occurred';
+        _errorMessage = l10n?.unexpectedError ?? 'An unexpected error occurred';
         _isLoading = false;
       });
     }
@@ -71,6 +74,8 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -89,7 +94,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Campus Guard',
+                    l10n.appTitle,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 32,
@@ -99,7 +104,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    _isLogin ? 'Welcome back!' : 'Create an account',
+                    _isLogin ? l10n.welcomeBack : l10n.createAccount,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16,
@@ -110,14 +115,14 @@ class _AuthScreenState extends State<AuthScreen> {
                   if (!_isLogin) ...[
                     TextFormField(
                       controller: _usernameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Username',
-                        prefixIcon: Icon(Icons.person),
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: l10n.username,
+                        prefixIcon: const Icon(Icons.person),
+                        border: const OutlineInputBorder(),
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return 'Please enter a username';
+                          return l10n.pleaseEnterUsername;
                         }
                         return null;
                       },
@@ -127,17 +132,17 @@ class _AuthScreenState extends State<AuthScreen> {
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      prefixIcon: Icon(Icons.email),
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.email,
+                      prefixIcon: const Icon(Icons.email),
+                      border: const OutlineInputBorder(),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Please enter an email';
+                        return l10n.pleaseEnterEmail;
                       }
                       if (!value.contains('@')) {
-                        return 'Please enter a valid email';
+                        return l10n.pleaseEnterValidEmail;
                       }
                       return null;
                     },
@@ -146,17 +151,17 @@ class _AuthScreenState extends State<AuthScreen> {
                   TextFormField(
                     controller: _passwordController,
                     obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Password',
-                      prefixIcon: Icon(Icons.lock),
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.password,
+                      prefixIcon: const Icon(Icons.lock),
+                      border: const OutlineInputBorder(),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter a password';
+                        return l10n.pleaseEnterPassword;
                       }
                       if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
+                        return l10n.passwordMinLength;
                       }
                       return null;
                     },
@@ -198,7 +203,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             ),
                           )
                         : Text(
-                            _isLogin ? 'Login' : 'Sign Up',
+                            _isLogin ? l10n.login : l10n.signUp,
                             style: const TextStyle(fontSize: 16),
                           ),
                   ),
@@ -214,8 +219,8 @@ class _AuthScreenState extends State<AuthScreen> {
                           },
                     child: Text(
                       _isLogin
-                          ? 'Don\'t have an account? Sign Up'
-                          : 'Already have an account? Login',
+                          ? l10n.dontHaveAccount
+                          : l10n.alreadyHaveAccount,
                       style: TextStyle(color: Colors.purple[700]),
                     ),
                   ),
