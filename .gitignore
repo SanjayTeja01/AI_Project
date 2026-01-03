@@ -45,14 +45,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Gradle cache and wrapper files
-.gradle/
-android/.gradle/
-**/.gradle/
-gradle-app.setting
-!gradle-wrapper.jar
-!gradle-wrapper.properties
-
 # Secret files - DO NOT COMMIT
 local.properties
 /android/local.properties

@@ -97,13 +97,16 @@
 
 3. **Google Maps Setup**
    - Get API key from [Google Cloud Console](https://console.cloud.google.com/)
-   - Enable Maps SDK for Android/iOS
-   - Add to `android/app/src/main/AndroidManifest.xml`:
-     ```xml
-     <meta-data
-         android:name="com.google.android.geo.API_KEY"
-         android:value="YOUR_API_KEY_HERE"/>
+   - Enable Maps SDK for Android
+   - Copy `local.properties.example` to `local.properties`:
+     ```bash
+     cp local.properties.example local.properties
      ```
+   - Edit `local.properties` and add your Google Maps API key:
+     ```
+     googleMapsApiKey=YOUR_ACTUAL_API_KEY_HERE
+     ```
+   - **Important**: `local.properties` is gitignored and will NOT be committed to the repository
 
 4. **Install & Run**
    ```bash

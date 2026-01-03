@@ -23,6 +23,11 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+def googleMapsApiKey = localProperties.getProperty('googleMapsApiKey')
+if (googleMapsApiKey == null) {
+    googleMapsApiKey = 'YOUR_API_KEY_HERE'
+}
+
 android {
     namespace "com.sanjay.campus_gaurd"
     compileSdk 34
@@ -48,6 +53,9 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
+        
+        // Inject Google Maps API Key from local.properties into manifest
+        manifestPlaceholders = [googleMapsApiKey: googleMapsApiKey]
     }
 
     buildTypes {
